@@ -1,19 +1,27 @@
 FROM alpine:latest as download
 
-RUN apk add curl
+# Instala las dependencias necesarias
+RUN apk add curl wget unzip
 
-RUN curl -s https://get-latest.deno.dev/pocketbase/pocketbase?no-v=true >> tag.txt
+# Especifica la versión deseada de PocketBase
+ENV POCKETBASE_VERSION=0.22.28
 
-RUN wget https://github.com/pocketbase/pocketbase/releases/download/v$(cat tag.txt)/pocketbase_$(cat tag.txt)_linux_amd64.zip \
-    && unzip pocketbase_$(cat tag.txt)_linux_amd64.zip \
+# Descarga el binario de la versión especificada
+RUN wget https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip \
+    && unzip pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip \
     && chmod +x /pocketbase
 
+# Crea la etapa final
 FROM alpine:latest
 
+# Instala las dependencias necesarias en la imagen final
 RUN apk update && apk add --update git build-base ca-certificates && rm -rf /var/cache/apk/*
 
+# Copia el binario descargado desde la etapa de compilación
 COPY --from=download /pocketbase /usr/local/bin/pocketbase
 
+# Expone el puerto 8090
 EXPOSE 8090
 
+# Configura el comando de inicio
 ENTRYPOINT /usr/local/bin/pocketbase serve --http=0.0.0.0:8090 --dir=/root/pocketbase
