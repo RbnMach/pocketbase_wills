@@ -4,7 +4,7 @@ FROM alpine:latest as download
 RUN apk add curl wget unzip
 
 # Define la versión específica de PocketBase que deseas
-ENV POCKETBASE_VERSION=0.25.8
+ENV POCKETBASE_VERSION=0.28.1
 
 # Descarga el binario de la versión deseada
 RUN wget https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip \
